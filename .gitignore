@@ -1,0 +1,48 @@
+# === Python cache and environment files ===
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pkl
+*.log
+
+# === Virtual environments ===
+venv/
+env/
+.venv/
+
+# === Data & models (large or sensitive files) ===
+*.h5
+*.keras
+*.pkl
+*.csv
+*.json
+*.xlsx
+*.zip
+*.tar
+*.gz
+*.npy
+*.npz
+
+# === IDE / editor files ===
+.vscode/
+.idea/
+.DS_Store
+
+# === OS-specific ===
+Thumbs.db
+
+# === Uvicorn / FastAPI temporary ===
+*.db
+*.sqlite3
+
+# === Uploaded / static data ===
+backend/static/uploaded_images/
+
+# === Jupyter Notebooks checkpoints ===
+.ipynb_checkpoints/
+
+# === Node / Frontend (if you add one later) ===
+node_modules/
+dist/
+build/
