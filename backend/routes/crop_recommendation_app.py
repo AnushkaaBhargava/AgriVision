@@ -1,23 +1,30 @@
-from fastapi import APIRouter, Query
-import numpy as np
+from fastapi import APIRouter
 import pickle
+import numpy as np
+from sklearn.preprocessing import LabelEncoder
 
 router = APIRouter()
 
-# ✅ Load trained model (replace .json with .pkl)
+# --- Load trained crop recommendation model ---
 with open("models/XGBoost-final-crop.pkl", "rb") as f:
     model = pickle.load(f)
 
+# --- Load the label encoder used during training ---
+encoder = pickle.load(open("models/label_encoder.pkl", "rb"))
+
 @router.get("/recommend_crop")
 async def recommend_crop(
-    N: int = Query(..., description="Nitrogen content in soil"),
-    P: int = Query(..., description="Phosphorus content in soil"),
-    K: int = Query(..., description="Potassium content in soil"),
-    temperature: float = Query(..., description="Temperature in °C"),
-    humidity: float = Query(..., description="Humidity percentage"),
-    ph: float = Query(..., description="pH value of the soil"),
-    rainfall: float = Query(..., description="Rainfall in mm")
+    N: float, P: float, K: float,
+    temperature: float, humidity: float,
+    ph: float, rainfall: float
 ):
-    features = np.array([[N, P, K, temperature, humidity, ph, rainfall]])
-    prediction = model.predict(features)
-    return {"recommended_crop": str(prediction[0])}
+    # Prepare input features
+    input_features = np.array([[N, P, K, temperature, humidity, ph, rainfall]])
+
+    # Get prediction (model returns encoded integer)
+    prediction = model.predict(input_features)
+
+    # Decode back to actual crop name using the encoder
+    crop_name = encoder.inverse_transform(prediction)[0]
+
+    return {"recommended_crop": crop_name}
