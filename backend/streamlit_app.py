@@ -27,6 +27,8 @@ label, .stNumberInput label, .stTextInput label, .stSelectbox label {
     color: #3B3B3B !important;
     font-weight: 600 !important;
 }
+            
+            
 
 /* NAVBAR */
 .top-nav {
@@ -126,6 +128,9 @@ div.stButton > button:hover {
     background-color: #365026 !important;
     color: white !important;
 }
+            
+            
+            
 
 </style>
 """, unsafe_allow_html=True)
