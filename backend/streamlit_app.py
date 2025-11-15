@@ -111,9 +111,25 @@ label, .stNumberInput label, .stTextInput label, .stSelectbox label {
     font-size: 48px;
     font-weight: 900;
 }
+        
+div.stButton > button {
+    background-color: #4E6B37 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 10px 20px !important;
+    font-weight: 600 !important;
+    box-shadow: 0px 3px 8px rgba(0,0,0,0.15);
+}
+
+div.stButton > button:hover {
+    background-color: #365026 !important;
+    color: white !important;
+}
 
 </style>
 """, unsafe_allow_html=True)
+
 
 
 
@@ -260,13 +276,71 @@ if page == "Disease Detection":
 
 
 # =================================================================
-# FERTILIZER ADVICE PAGE
+# FERTILIZER ADVICE PAGE (Simple Query Param Version)
 # =================================================================
 if page == "Fertilizer Advice":
 
     st.title("🧪 Fertilizer Recommendations")
 
-    st.markdown("<div class='fert-card'>🌱 DAP — 51.6 kg/acre</div>", unsafe_allow_html=True)
-    st.markdown("<div class='fert-card'>🍃 Compost — 5500 kg/acre</div>", unsafe_allow_html=True)
-    st.markdown("<div class='fert-card'>🧪 MOP — 40 kg/acre</div>", unsafe_allow_html=True)
+    col1, col2, col3 = st.columns(3)
 
+    with col1:
+        N = st.number_input("Nitrogen (N)", 0.0, 300.0, 90.0)
+        P = st.number_input("Phosphorus (P)", 0.0, 300.0, 40.0)
+
+    with col2:
+        K = st.number_input("Potassium (K)", 0.0, 300.0, 45.0)
+        temperature = st.number_input("Temperature (°C)", 0.0, 60.0, 25.0)
+
+    with col3:
+        humidity = st.number_input("Humidity (%)", 0.0, 100.0, 80.0)
+        ph = st.number_input("Soil pH", 0.0, 14.0, 6.5)
+        rainfall = st.number_input("Rainfall (mm)", 0.0, 1000.0, 200.0)
+
+    if st.button("🔍 Get Fertilizer Advice"):
+
+        params = {
+            "N": N,
+            "P": P,
+            "K": K,
+            "temperature": temperature,
+            "humidity": humidity,
+            "ph": ph,
+            "rainfall": rainfall
+        }
+
+        with st.spinner("Fetching fertilizer advice..."):
+            response = requests.post(f"{BACKEND_URL}/fertilizer/predict", params=params)
+
+        if response.status_code == 200:
+            result = response.json()
+
+            st.success("Fertilizer recommendation ready!")
+
+            st.markdown(f"""
+                <div class='fert-card'>
+                    <b>🌱 Fertilizer Package:</b><br>{result['fertilizer_package']}
+                </div>
+            """, unsafe_allow_html=True)
+
+            st.markdown(f"""
+                <div class='fert-card'>
+                    <b>📦 Dosage:</b> {result['dosage_kg_per_acre_or_tree']}
+                </div>
+            """, unsafe_allow_html=True)
+
+            st.markdown(f"""
+                <div class='fert-card'>
+                    <b>⏳ Application Frequency:</b> {result['application_frequency']}
+                </div>
+            """, unsafe_allow_html=True)
+
+            st.markdown(f"""
+                <div class='fert-card'>
+                    <b>📝 Notes:</b><br>{result['recommendation_notes']}
+                </div>
+            """, unsafe_allow_html=True)
+
+        else:
+            st.error("❌ Failed to fetch fertilizer recommendation.")
+            st.write(response.text)
