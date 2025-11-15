@@ -3,41 +3,202 @@ import requests
 from PIL import Image
 import io
 
-# -------------------
-# CONFIG
-# -------------------
-BACKEND_URL = "http://127.0.0.1:8000"  # Change if deployed
+# ----------------------------------------------------------
+# PAGE CONFIG + FORCE LIGHT MODE
+# ----------------------------------------------------------
+st.set_page_config(page_title="AgriVision", page_icon="🌱", layout="wide")
 
-st.set_page_config(page_title="AgriVision", page_icon="🌾", layout="centered")
+st.markdown("""
+<style>
+/* FORCE LIGHT MODE */
+[data-testid="stAppViewContainer"] {
+    background-color: #F4F6EE !important;
+    color: black !important;
+}
+[data-testid="stHeader"] {
+    background-color: #F4F6EE !important;
+}
+[data-testid="stToolbar"] {
+    background-color: #F4F6EE !important;
+}
 
-# -------------------
-# SIDEBAR
-# -------------------
-st.sidebar.title("🌱 AgriVision")
-st.sidebar.write("AI-based Crop Recommendation and Disease Detection System")
-st.sidebar.divider()
-page = st.sidebar.radio("Select Feature", ["Crop Recommendation 🌾", "Disease Detection 🍃"])
+            /* FIX INPUT LABELS NOT VISIBLE */
+label, .stNumberInput label, .stTextInput label, .stSelectbox label {
+    color: #3B3B3B !important;
+    font-weight: 600 !important;
+}
 
-# -------------------
-# CROP RECOMMENDATION
-# -------------------
-if page == "Crop Recommendation 🌾":
-    st.header("🌾 Crop Recommendation System")
-    st.write("Enter soil and environmental details:")
+/* NAVBAR */
+.top-nav {
+    width: 100%;
+    background-color: #E9F2D9;
+    padding: 14px 0;
+    border-bottom: 2px solid #DADFCC;
+    display: flex;
+    justify-content: center;
+    gap: 45px;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+}
+
+.nav-btn {
+    padding: 10px 22px;
+    background: #F5F8EC;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #3F5F32;
+    border: 1px solid #D6E3C5;
+    cursor: pointer;
+}
+
+.nav-btn:hover {
+    background-color: #DCE8C7;
+}
+
+.active-nav {
+    background-color: #4E6B37 !important;
+    color: white !important;
+    border: none !important;
+}
+
+/* Cards */
+.agri-card {
+    background: #FFFFFF;
+    padding: 22px 28px;
+    border-radius: 18px;
+    box-shadow: 0px 8px 22px rgba(0,0,0,0.06);
+    margin-bottom: 25px;
+}
+
+/* Fert Cards */
+.fert-card {
+    background: #F5F8EC;
+    padding: 18px;
+    border-radius: 14px;
+    border: 1px solid #DCE8C8;
+    margin-bottom: 12px;
+}
+
+/* Disease Result */
+.result-card {
+    background: #FFF4D7;
+    padding: 22px;
+    border-radius: 16px;
+    border-left: 8px solid #E5A437;
+    margin-top: 15px;
+    margin-bottom: 20px;
+}
+
+.alert-card {
+    background: #FFF8E7;
+    padding: 18px;
+    border-radius: 12px;
+    border-left: 6px solid #F2A83A;
+}
+
+.score-box {
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0px 7px 18px rgba(0,0,0,0.07);
+}
+
+.score-num {
+    color: #3F6B2F;
+    font-size: 48px;
+    font-weight: 900;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+
+
+# ----------------------------------------------------------
+# TOP NAVIGATION BAR
+# ----------------------------------------------------------
+if "page" not in st.session_state:
+    st.session_state.page = "Dashboard"
+
+menu_items = ["Dashboard", "Crop Recommendation", "Disease Detection", "Fertilizer Advice"]
+
+st.markdown("<div class='top-nav'>", unsafe_allow_html=True)
+cols = st.columns(len(menu_items))
+
+for i, item in enumerate(menu_items):
+    if item == st.session_state.page:
+        cols[i].button(item, key=item, help=item)
+        st.markdown("<style>div[data-testid='stButton'] button {background:#4E6B37;color:white;}</style>",
+                    unsafe_allow_html=True)
+    else:
+        if cols[i].button(item, key=item):
+            st.session_state.page = item
+
+st.markdown("</div>", unsafe_allow_html=True)
+
+BACKEND_URL = "http://127.0.0.1:8000"
+page = st.session_state.page
+
+
+
+# =================================================================
+# DASHBOARD PAGE
+# =================================================================
+if page == "Dashboard":
+
+    st.title("🌾 Welcome to AgriVision Dashboard")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown("<div class='agri-card'>", unsafe_allow_html=True)
+        st.header("🌤 Weather Today: 32°C")
+        st.write("Min: 28°C • Max: 35°C")
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    with col2:
+        st.markdown("<div class='agri-card'>", unsafe_allow_html=True)
+        st.header("👋 Hello Farmer!")
+        st.write("Here are today's insights for your crops.")
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    st.markdown("<div class='agri-card'>", unsafe_allow_html=True)
+    st.subheader("🌿 Best Crop Today: Cotton")
+    st.write("Yield: 85% • Profit: 92% • Sustainability: 78%")
+    st.markdown("</div>", unsafe_allow_html=True)
+
+
+
+# =================================================================
+# CROP RECOMMENDATION PAGE
+# =================================================================
+if page == "Crop Recommendation":
+
+    st.markdown("<div class='agri-card'>", unsafe_allow_html=True)
+    st.header("🌾 Crop Recommendation")
+    st.write("Enter the soil and climate details below:")
+    st.markdown("</div>", unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns(3)
+
     with col1:
-        N = st.number_input("Nitrogen (N)", min_value=0, max_value=140, value=50)
-        P = st.number_input("Phosphorus (P)", min_value=0, max_value=140, value=50)
-        K = st.number_input("Potassium (K)", min_value=0, max_value=200, value=50)
+        N = st.number_input("Nitrogen (N)", 0, 200, 50)
+        P = st.number_input("Phosphorus (P)", 0, 200, 50)
+
     with col2:
-        temperature = st.number_input("Temperature (°C)", min_value=0.0, max_value=50.0, value=25.0)
-        humidity = st.number_input("Humidity (%)", min_value=0.0, max_value=100.0, value=70.0)
+        K = st.number_input("Potassium (K)", 0, 200, 50)
+        temperature = st.number_input("Temperature (°C)", 0, 50, 25)
+
     with col3:
-        ph = st.number_input("pH", min_value=0.0, max_value=14.0, value=6.5)
-        rainfall = st.number_input("Rainfall (mm)", min_value=0.0, max_value=500.0, value=100.0)
+        humidity = st.number_input("Humidity (%)", 0, 100, 70)
+        ph = st.number_input("Soil pH", 0.0, 14.0, 6.5)
+        rainfall = st.number_input("Rainfall (mm)", 0, 500, 100)
 
     if st.button("🌱 Recommend Crop"):
+
         params = {
             "N": N, "P": P, "K": K,
             "temperature": temperature,
@@ -50,34 +211,62 @@ if page == "Crop Recommendation 🌾":
             response = requests.get(f"{BACKEND_URL}/crop/recommend_crop", params=params)
 
         if response.status_code == 200:
-            crop_name = response.json().get("recommended_crop", "Unknown")
-            st.success(f"✅ Recommended Crop: **{crop_name}**")
+            result = response.json()
+            crop = result.get("recommended_crop", "Unknown")
+
+            st.markdown("<div class='agri-card'>", unsafe_allow_html=True)
+            st.subheader(f"🌿 Recommended Crop: **{crop}**")
+            st.markdown("</div>", unsafe_allow_html=True)
         else:
-            st.error("❌ Something went wrong. Please try again.")
+            st.error("❌ Failed to fetch recommendation.")
 
-# -------------------
-# DISEASE DETECTION
-# -------------------
-elif page == "Disease Detection 🍃":
-    st.header("🍃 Plant Disease Detection")
-    st.write("Upload a leaf image to detect disease:")
 
-    uploaded_file = st.file_uploader("Upload leaf image", type=["jpg", "jpeg", "png"])
 
-    if uploaded_file is not None:
+# =================================================================
+# DISEASE DETECTION PAGE
+# =================================================================
+if page == "Disease Detection":
+
+    st.title("🍁 Plant Disease Detection")
+
+    uploaded_file = st.file_uploader("Upload a leaf image", type=["jpg", "jpeg", "png"])
+
+    if uploaded_file:
         image = Image.open(uploaded_file)
-        st.image(image, caption="Uploaded Leaf", use_container_width=True)
+        st.image(image, caption="Uploaded Leaf", width=300)
 
         if st.button("🔍 Detect Disease"):
+
+            files = {"file": uploaded_file.getvalue()}
+
             with st.spinner("Analyzing image..."):
-                files = {"file": uploaded_file.getvalue()}
                 response = requests.post(f"{BACKEND_URL}/disease/detect_disease", files=files)
 
             if response.status_code == 200:
                 result = response.json()
-                disease = result.get("disease", "Unknown")
-                confidence = result.get("confidence", 0.0)
-                st.success(f"🩺 Disease: **{disease}**")
-                st.info(f"Confidence: **{confidence:.2f}%**")
+                disease = result.get("disease")
+                confidence = result.get("confidence")
+
+                st.markdown(f"""
+                <div class='result-card'>
+                    <h3>🌿 Detected Disease: {disease}</h3>
+                    <p><b>Confidence: {confidence:.2f}%</b></p>
+                </div>
+                """, unsafe_allow_html=True)
+
             else:
-                st.error("❌ Failed to detect disease. Try again.")
+                st.error("❌ Failed to detect disease.")
+
+
+
+# =================================================================
+# FERTILIZER ADVICE PAGE
+# =================================================================
+if page == "Fertilizer Advice":
+
+    st.title("🧪 Fertilizer Recommendations")
+
+    st.markdown("<div class='fert-card'>🌱 DAP — 51.6 kg/acre</div>", unsafe_allow_html=True)
+    st.markdown("<div class='fert-card'>🍃 Compost — 5500 kg/acre</div>", unsafe_allow_html=True)
+    st.markdown("<div class='fert-card'>🧪 MOP — 40 kg/acre</div>", unsafe_allow_html=True)
+

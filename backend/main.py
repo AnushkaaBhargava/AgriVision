@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routes import crop_recommendation_app, disease_routes
+from routes import crop_recommendation_app, disease_routes,fertilizer_routes
 
 app = FastAPI(
     title="AgriVision",
@@ -10,6 +10,7 @@ app = FastAPI(
 # ✅ Route integrations
 app.include_router(crop_recommendation_app.router, prefix="/crop", tags=["Crop Recommendation"])
 app.include_router(disease_routes.router, prefix="/disease", tags=["Plant Disease Detection"])
+app.include_router(fertilizer_routes.router, prefix="/fertilizer", tags=["Fertilizer Recommendation"])
 
 # ✅ Health check route
 @app.get("/")
