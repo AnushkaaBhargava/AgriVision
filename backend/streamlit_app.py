@@ -2,6 +2,33 @@ import streamlit as st
 import requests
 from PIL import Image
 import io
+import requests
+
+API_KEY = "47cb1c9f0698c59b57e6f6ec620cbfbc"     # ← put your key here
+CITY = "Greater Noida"
+UNITS = "metric"                         # Celsius
+
+def get_weather(city):
+    url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units={UNITS}"
+    
+    try:
+        r = requests.get(url)
+        data = r.json()
+
+        if data.get("cod") != 200:
+            return None
+        
+        return {
+            "temp": data["main"]["temp"],
+            "temp_min": data["main"]["temp_min"],
+            "temp_max": data["main"]["temp_max"],
+            "humidity": data["main"]["humidity"],
+            "description": data["weather"][0]["description"].title()
+        }
+
+    except:
+        return None
+
 
 # ----------------------------------------------------------
 # PAGE CONFIG + FORCE LIGHT MODE
@@ -68,7 +95,7 @@ label, .stNumberInput label, .stTextInput label, .stSelectbox label {
 /* Cards */
 .agri-card {
     background: #FFFFFF;
-    padding: 22px 28px;
+    padding: 10px 15px;
     border-radius: 18px;
     box-shadow: 0px 8px 22px rgba(0,0,0,0.06);
     margin-bottom: 25px;
@@ -176,9 +203,17 @@ if page == "Dashboard":
 
     with col1:
         st.markdown("<div class='agri-card'>", unsafe_allow_html=True)
-        st.header("🌤 Weather Today: 32°C")
-        st.write("Min: 28°C • Max: 35°C")
+        weather = get_weather(CITY)
+        if weather:
+            st.header(f"🌤 Weather Today: {weather['temp']}°C")
+            st.write(f"Min: {weather['temp_min']}°C • Max: {weather['temp_max']}°C")
+            st.write(f"Condition: {weather['description']}")
+        else:
+            st.header("🌤 Weather Today: N/A")
+            st.write("⚠ Unable to load live weather data.")
+            
         st.markdown("</div>", unsafe_allow_html=True)
+
 
     with col2:
         st.markdown("<div class='agri-card'>", unsafe_allow_html=True)
