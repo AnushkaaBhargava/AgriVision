@@ -4,7 +4,11 @@ from PIL import Image
 import io
 import requests
 
-API_KEY = "47cb1c9f0698c59b57e6f6ec620cbfbc"     # ← put your key here
+from dotenv import load_dotenv
+import os
+load_dotenv()
+API_KEY = os.getenv("API_KEY")
+
 CITY = "Greater Noida"
 UNITS = "metric"                         # Celsius
 

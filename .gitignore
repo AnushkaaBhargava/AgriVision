@@ -46,3 +46,6 @@ backend/static/uploaded_images/
 node_modules/
 dist/
 build/
+
+.env
+
