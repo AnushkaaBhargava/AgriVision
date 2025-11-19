@@ -11,23 +11,29 @@ API_KEY = os.getenv("API_KEY")
 
 CITY = "Greater Noida"
 UNITS = "metric"                         # Celsius
-
 def get_weather(city):
-    url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units={UNITS}"
-    
+    url = f"https://api.openweathermap.org/data/2.5/forecast?q={city}&appid={API_KEY}&units={UNITS}"
+
     try:
         r = requests.get(url)
         data = r.json()
 
-        if data.get("cod") != 200:
+        if data.get("cod") != "200":
             return None
-        
+
+        # The API returns 40 entries (3-hour intervals for 5 days)
+        today = data["list"][:8]   # first 8 entries = today (24 hours)
+
+        temps = [item["main"]["temp"] for item in today]
+        min_temps = [item["main"]["temp_min"] for item in today]
+        max_temps = [item["main"]["temp_max"] for item in today]
+        descriptions = [item["weather"][0]["description"] for item in today]
+
         return {
-            "temp": data["main"]["temp"],
-            "temp_min": data["main"]["temp_min"],
-            "temp_max": data["main"]["temp_max"],
-            "humidity": data["main"]["humidity"],
-            "description": data["weather"][0]["description"].title()
+            "temp": temps[0],  # current-ish
+            "temp_min": min(min_temps),
+            "temp_max": max(max_temps),
+            "description": max(set(descriptions), key=descriptions.count).title(),
         }
 
     except:
