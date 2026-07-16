@@ -7,18 +7,18 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# ✅ Route integrations
+#  Route integrations
 app.include_router(crop_recommendation_app.router, prefix="/crop", tags=["Crop Recommendation"])
 app.include_router(disease_routes.router, prefix="/disease", tags=["Plant Disease Detection"])
 app.include_router(fertilizer_routes.router, prefix="/fertilizer", tags=["Fertilizer Recommendation"])
 
-# ✅ Health check route
+#  Health check route
 @app.get("/")
 def home():
     return {"message": "Welcome to AgriVision API! Use /docs to test the endpoints."}
 
 
-# ✅ For running directly (useful for debugging)
+# For running directly (useful for debugging)
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="127.0.0.1", port=8000, reload=True)

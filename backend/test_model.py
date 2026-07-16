@@ -32,10 +32,10 @@ model = Sequential([
     Dense(NUM_CLASSES, activation='softmax')
 ])
 
-# ✅ Build model before loading weights
+# Build model before loading weights
 model.build((None, IMAGE_SIZE, IMAGE_SIZE, 3))
 
-# ✅ Now load weights
+#  Now load weights
 model.load_weights("models/disease_model.weights.h5")
 print("✅ Model weights loaded successfully!")
 
