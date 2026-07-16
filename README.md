@@ -26,12 +26,17 @@ A Smart Agriculture Recommendation System that helps farmers make informed decis
   ## 📸 Screenshots
 
 <p align="center">
-  <img src="screenshots/agrivision_home.png" width="48%" alt="Home">
-  <img src="screenshots/recommendation.png" width="48%" alt="Crop Recommendation">
+  <img src="screenshots/recommendation.png" width="75%" alt="Crop Recommendation">
 </p>
 
 <p align="center">
+  <img src="screenshots/agrivision_home.png" width="48%" alt="Home">
   <img src="screenshots/disease.png" width="48%" alt="Disease Detection">
+</p>
+
+<p align="center">
+  <img src="screenshots/fertilizer.png" width="48%" alt="Home">
+  <img src="screenshots/rainfall.png" width="48%" alt="Disease Detection">
 </p>
 
 ## Future Improvements
